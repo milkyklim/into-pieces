@@ -1,7 +1,5 @@
 bridges = []
 persistence_dir = ''
-ui_bundles = []
-ui_interfaces = []
 
 [[agents]]
 id = 'hc-run-agent'
@@ -11,28 +9,42 @@ public_address = 'HcScjN8wBwrn3tuyg89aab3a69xsIgdzmX5P9537BqQZ5A7TEZu7qCY4Xzzjhm
 test_agent = true
 
 [[dnas]]
-file = '/Users/kkolyva/into-pieces/dist/into-pieces.dna.json'
+file = 'dist/into-pieces.dna.json'
 hash = 'QmTUpXQczepSfyVCq1TkHuaWj3cAqMNXSFUKGCWusvbVxV'
-id = 'hc-run-dna'
+id = '__into_pieces'
 
 [[instances]]
 agent = 'hc-run-agent'
-dna = 'hc-run-dna'
-id = 'test-instance'
+dna = '__into_pieces'
+id = '__into_pieces'
 
 [instances.storage]
 type = 'memory'
 
 [[interfaces]]
-admin = true
-id = 'websocket-interface'
+admin = false
+choose_free_port = false
+id = 'into_pieces_ui'
 
 [[interfaces.instances]]
-id = 'test-instance'
+alias = 'test-instance'
+id = '__into_pieces'
 
 [interfaces.driver]
+port = 50000
+type = 'websocket'
+
+[[ui_bundles]]
+id = 'into_pieces_ui'
+root_dir = 'gui'
+
+[[ui_interfaces]]
+bind_address = '127.0.0.1'
+bundle = 'into_pieces_ui'
+dna_interface = 'into_pieces_ui'
+id = 'into_pieces_ui'
 port = 8888
-type = 'http'
+reroute_to_root = false
 
 [logger]
 state_dump = true
