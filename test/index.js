@@ -48,6 +48,9 @@ const config = Config.gen(
 orchestrator.registerScenario("Test hello holo", async (s, t) => {
   const { alice, bob } = await s.players({ alice: config, bob: config }, true);
 
+  const message = "Some text";
+  const timestamp = 1580137056;
+
   const result = await alice.call(
     "into_pieces",
     "into_pieces",
@@ -61,37 +64,30 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
   const create_result = await alice.call(
     "into_pieces",
     "into_pieces",
-    "create_person",
+    "create_post",
     {
-      person: { name: "Alice" },
+      message: message,
+      timestamp: timestamp,
     },
   );
   t.ok(create_result.Ok);
-  const alice_person_address = create_result.Ok;
+  const alice_person_address = alice.instance("into_pieces").agentAddress;
 
   await s.consistency();
 
-  const retrieve_result = await alice.call(
+  const retrieve_result = await bob.call(
     "into_pieces",
     "into_pieces",
-    "retrieve_person",
-    { address: alice_person_address },
+    "retrieve_posts",
+    { agent_address: alice_person_address },
   );
 
   t.ok(retrieve_result.Ok);
-  t.deepEqual(retrieve_result, { Ok: { name: "Alice" } });
-
-  await s.consistency();
-
-  const bob_retrieve_result = await bob.call(
-    "into_pieces",
-    "into_pieces",
-    "retrieve_person",
-    { address: alice_person_address },
-  );
-
-  t.ok(bob_retrieve_result.Ok);
-  t.deepEqual(bob_retrieve_result, { Ok: { name: "Alice" } });
+  t.deepEqual(retrieve_result.Ok[0], {
+    message: message,
+    timestamp: timestamp,
+    author_id: alice_person_address,
+  });
 });
 
 orchestrator.run();
