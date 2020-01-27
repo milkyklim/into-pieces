@@ -1,9 +1,9 @@
 {
-  "name": "Holochain App Name",
-  "description": "A Holochain app",
+  "name": "Into Pieces",
+  "description": "Paste your texts -- spread the word!",
   "authors": [
     {
-      "identifier": "Author Name <author@name.com>",
+      "identifier": "milkyklim <10698619+milkyklim@users.noreply.github.com>",
       "public_key_source": "",
       "signature": ""
     }
