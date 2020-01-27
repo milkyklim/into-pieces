@@ -10,7 +10,7 @@ test_agent = true
 
 [[dnas]]
 file = 'dist/into-pieces.dna.json'
-hash = 'QmTUpXQczepSfyVCq1TkHuaWj3cAqMNXSFUKGCWusvbVxV'
+hash = 'QmfZrPdo9CFEvzjPGpfpmygbeeEuDGabGDzXGoq8AUQsCJ'
 id = '__into_pieces'
 
 [[instances]]
