@@ -59,7 +59,7 @@ mod into_pieces_zome {
         entry!(
             name: "person",
             description: "Person to say hello to",
-            sharing: Sharing::Private,
+            sharing: Sharing::Public,
             validation_package: || {
                 hdk::ValidationPackageDefinition::Entry
             },

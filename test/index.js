@@ -80,6 +80,18 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
 
   t.ok(retrieve_result.Ok);
   t.deepEqual(retrieve_result, { Ok: { name: "Alice" } });
+
+  await s.consistency();
+
+  const bob_retrieve_result = await bob.call(
+    "into_pieces",
+    "into_pieces",
+    "retrieve_person",
+    { address: alice_person_address },
+  );
+
+  t.ok(bob_retrieve_result.Ok);
+  t.deepEqual(bob_retrieve_result, { Ok: { name: "Alice" } });
 });
 
 orchestrator.run();
