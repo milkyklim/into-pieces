@@ -42,6 +42,7 @@ const config = Config.gen(
       type: "sim2h",
       sim2h_url: "ws://localhost:9000",
     },
+    logger: Config.logger({ type: "error" }),
   },
 );
 
