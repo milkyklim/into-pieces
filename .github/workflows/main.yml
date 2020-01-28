@@ -1,0 +1,18 @@
+name: CI
+
+on: [push]
+
+jobs:
+  main:
+
+    runs-on: ubuntu-latest
+
+    container: 
+      image: holochain/holonix:latest
+    env:
+      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Test into pieces
+      run: nix-shell https://holochain.love --run 'sim2h_server & hc test'
