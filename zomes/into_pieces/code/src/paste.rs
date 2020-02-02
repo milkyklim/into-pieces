@@ -1,40 +1,34 @@
 extern crate hdk;
 extern crate hdk_proc_macros;
+extern crate holochain_json_derive;
 extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
-extern crate holochain_json_derive;
 
-use hdk::{
-    entry_definition::ValidatingEntryType,
-    error::ZomeApiResult,
-};
+use hdk::{entry_definition::ValidatingEntryType, error::ZomeApiResult};
 
-use hdk::holochain_core_types::{
-    entry::Entry,
-    dna::entry_types::Sharing,
-    link::LinkMatch
-};
+use hdk::holochain_core_types::{dna::entry_types::Sharing, entry::Entry, link::LinkMatch};
 
-use hdk::holochain_json_api::{
-    json::JsonString,
-    error::JsonError,
-};
+use hdk::holochain_json_api::{error::JsonError, json::JsonString};
 
-use hdk::holochain_persistence_api::{
-    cas::content::Address,
-};
-
-#[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
-pub struct Person {
-    name: String
-}
+use hdk::holochain_persistence_api::cas::content::Address;
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct Paste {
-    message: String,
+    title: String,
+    text: String,
+    language: String,
     timestamp: u64,
-    author_id: Address
+    // Probably be UNIX end date
+    expiration: u64,
+    // Probably a privat entry rather than password
+    // password: String
+    author_id: Address,
+    // Probably marked if not directly removed
+    reported: bool, // Probably counter signing or smth like that
+                    // This one probably will be a list of all links
+                    // rather than one link in total
+                    // edit_link: String
 }
 
 pub fn paste_entry_def() -> ValidatingEntryType {
@@ -48,8 +42,8 @@ pub fn paste_entry_def() -> ValidatingEntryType {
         validation: | validation_data: hdk::EntryValidationData<Paste> | {
             match validation_data {
                 hdk::EntryValidationData::Create{ entry, .. } => {
-                    const MAX_LENGTH: usize = 140;
-                    if entry.message.len() <= MAX_LENGTH {
+                    const MAX_LENGTH: usize = 1024;
+                    if entry.text.len() <= MAX_LENGTH {
                         Ok(())
                     } else {
                         Err("Paste too long".into())
@@ -73,11 +67,29 @@ pub fn paste_entry_def() -> ValidatingEntryType {
     )
 }
 
-pub fn create_paste(message: String, timestamp: u64) -> ZomeApiResult<Address> {
+// title: String
+// text: String,
+// language: String,
+// timestamp: u64,
+// expiration: u64,
+// author_id: Address,
+// reported: bool
+
+pub fn create_paste(
+    title: String,
+    text: String,
+    language: String,
+    timestamp: u64,
+    expiration: u64,
+) -> ZomeApiResult<Address> {
     let paste = Paste {
-        message, 
+        title,
+        text,
+        language,
         timestamp,
+        expiration,
         author_id: hdk::AGENT_ADDRESS.clone(),
+        reported: false,
     };
 
     let agent_address = hdk::AGENT_ADDRESS.clone().into();

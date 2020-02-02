@@ -49,8 +49,11 @@ const config = Config.gen(
 orchestrator.registerScenario("Test hello holo", async (s, t) => {
   const { alice, bob } = await s.players({ alice: config, bob: config }, true);
 
-  const message = "Some text";
+  const title = "First paste of all";
+  const text = "Have you ever tried into pieces?";
+  const language = "Plain";
   const timestamp = 1580137056;
+  const expiration = 1580167056;
 
   const result = await alice.call(
     "into_pieces",
@@ -67,8 +70,11 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
     "into_pieces",
     "create_paste",
     {
-      message: message,
+      title: title,
+      text: text,
+      language: language,
       timestamp: timestamp,
+      expiration: expiration,
     },
   );
   t.ok(create_result.Ok);
@@ -85,9 +91,13 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
 
   t.ok(retrieve_result.Ok);
   t.deepEqual(retrieve_result.Ok[0], {
-    message: message,
+    title: title,
+    text: text,
+    language: language,
     timestamp: timestamp,
+    expiration: expiration,
     author_id: alice_person_address,
+    reported: false,
   });
 });
 
