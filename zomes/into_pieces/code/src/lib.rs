@@ -20,7 +20,7 @@ use hdk::holochain_persistence_api::{
 
 use hdk_proc_macros::zome;
 
-pub mod post;
+pub mod paste;
 
 #[zome]
 mod into_pieces_zome {
@@ -47,17 +47,17 @@ mod into_pieces_zome {
     }
 
     #[entry_def]
-    fn post_entry_def() -> ValidatingEntryType {
-        post::post_entry_def()
+    fn paste_entry_def() -> ValidatingEntryType {
+        paste::paste_entry_def()
     }
 
     #[zome_fn("hc_public")]
-    pub fn create_post(message: String, timestamp: u64) -> ZomeApiResult<Address> {
-        post::create_post(message, timestamp)
+    pub fn create_paste(message: String, timestamp: u64) -> ZomeApiResult<Address> {
+        paste::create_paste(message, timestamp)
     }
 
     #[zome_fn("hc_public")]
-    pub fn retrieve_posts(agent_address: Address) -> ZomeApiResult<Vec<post::Post>> {
-        post::retrieve_posts(agent_address)
+    pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<paste::Paste>> {
+        paste::retrieve_pastes(agent_address)
     }
 }

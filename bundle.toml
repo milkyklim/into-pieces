@@ -3,7 +3,7 @@ bridges = []
 [[instances]]
 name = "into_pieces"
 id = "__into_pieces"
-dna_hash = "QmcNwT511Y1rtzxQ6v5bfNiGSf6fFi6scXbCGuE9BAeTbC"
+dna_hash = "QmNqz2PVGGwW28QDTsFvcg3sqBNY3dyv5uwxqdNfo6hS3d"
 uri = "file:dist/into-pieces.dna.json" 
 
 [[UIs]]

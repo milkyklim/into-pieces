@@ -65,7 +65,7 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
   const create_result = await alice.call(
     "into_pieces",
     "into_pieces",
-    "create_post",
+    "create_paste",
     {
       message: message,
       timestamp: timestamp,
@@ -79,7 +79,7 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
   const retrieve_result = await bob.call(
     "into_pieces",
     "into_pieces",
-    "retrieve_posts",
+    "retrieve_pastes",
     { agent_address: alice_person_address },
   );
 
