@@ -5,7 +5,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-use hdk::{entry_definition::ValidatingEntryType, error::ZomeApiResult};
+use hdk::{entry_definition::ValidatingEntryType, error::ZomeApiError, error::ZomeApiResult};
 
 use hdk::holochain_core_types::{dna::entry_types::Sharing, entry::Entry, link::LinkMatch};
 
@@ -31,6 +31,32 @@ pub struct Paste {
                     // edit_link: String
 }
 
+fn validate_entry(paste: &Paste) -> Result<(), String> {
+    // TODO: verify that this one is correct
+    validate_title(&paste.title).and_then(|_| validate_text(&paste.text))
+}
+
+fn validate_title(title: &str) -> Result<(), String> {
+    const MAX_TITLE_LENGTH: usize = 50;
+    const INFO_TEXT: &str = &"Symbols in title above";
+
+    check_length(title, MAX_TITLE_LENGTH, INFO_TEXT)
+}
+
+fn validate_text(text: &str) -> Result<(), String> {
+    const MAX_TEXT_LENGTH: usize = 1024;
+    const INFO_TEXT: &str = &"Symbols in text above";
+
+    check_length(text, MAX_TEXT_LENGTH, INFO_TEXT)
+}
+
+fn check_length(s: &str, max_length: usize, info_text: &str) -> Result<(), String> {
+    match s.len() < max_length {
+        true => Ok(()),
+        false => Err(format!("{} {}", info_text, max_length).to_string()),
+    }
+}
+
 pub fn paste_entry_def() -> ValidatingEntryType {
     entry!(
         name: "paste",
@@ -42,12 +68,7 @@ pub fn paste_entry_def() -> ValidatingEntryType {
         validation: | validation_data: hdk::EntryValidationData<Paste> | {
             match validation_data {
                 hdk::EntryValidationData::Create{ entry, .. } => {
-                    const MAX_LENGTH: usize = 1024;
-                    if entry.text.len() <= MAX_LENGTH {
-                        Ok(())
-                    } else {
-                        Err("Paste too long".into())
-                    }
+                    validate_entry(&entry)
                 },
                 _ => Ok(()),
             }
@@ -98,6 +119,16 @@ pub fn create_paste(
 
     hdk::link_entries(&agent_address, &address, "author_paste", "")?;
     Ok(address)
+}
+
+pub fn remove_paste(paste_address: Address) -> ZomeApiResult<Address> {
+    hdk::remove_entry(&paste_address)
+}
+
+pub fn update(// TODO
+) -> ZomeApiResult<Address> {
+    // TODO
+    Err(ZomeApiError::from(String::from("Do your homework please")))
 }
 
 pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<Paste>> {
