@@ -1,0 +1,6 @@
+{
+  "rust.clippy_preference": "on",
+  "rust.build_on_save": true,
+  "editor.formatOnSave": true,
+  "rust.all_features": true
+}

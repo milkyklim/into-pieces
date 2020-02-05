@@ -9,13 +9,14 @@ extern crate serde_json;
 #[macro_use]
 extern crate holochain_json_derive;
 
-use hdk::{entry_definition::ValidatingEntryType, error::ZomeApiResult};
-
 use hdk::holochain_persistence_api::cas::content::Address;
+use hdk::prelude::Entry;
+use hdk::{entry_definition::ValidatingEntryType, error::ZomeApiResult};
 
 use hdk_proc_macros::zome;
 
 pub mod paste;
+use paste::Paste;
 
 #[zome]
 mod into_pieces_zome {
@@ -58,7 +59,12 @@ mod into_pieces_zome {
     }
 
     #[zome_fn("hc_public")]
-    pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<paste::Paste>> {
+    fn get_paste(address: Address) -> ZomeApiResult<Option<Entry>> {
+        hdk::get_entry(&address)
+    }
+
+    #[zome_fn("hc_public")]
+    pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<Paste>> {
         paste::retrieve_pastes(agent_address)
     }
 }

@@ -88,14 +88,6 @@ pub fn paste_entry_def() -> ValidatingEntryType {
     )
 }
 
-// title: String
-// text: String,
-// language: String,
-// timestamp: u64,
-// expiration: u64,
-// author_id: Address,
-// reported: bool
-
 pub fn create_paste(
     title: String,
     text: String,
