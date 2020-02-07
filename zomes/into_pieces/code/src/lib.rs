@@ -37,8 +37,13 @@ mod into_pieces_zome {
     }
 
     #[zome_fn("hc_public")]
-    pub fn get_agent_id() -> ZomeApiResult<Address> {
-        Ok(hdk::AGENT_ADDRESS.clone())
+    fn get_my_address() -> ZomeApiResult<Address> {
+      Ok(AGENT_ADDRESS.clone())
+    }
+
+    #[entry_def]
+    fn anchor_entry_def() -> ValidatingEntryType {
+        paster::anchor_entry_def()
     }
 
     #[entry_def]
@@ -58,7 +63,39 @@ mod into_pieces_zome {
     }
 
     #[zome_fn("hc_public")]
-    pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<paste::Paste>> {
+    fn get_paste(address: Address) -> ZomeApiResult<Option<Entry>> {
+        hdk::get_paste(&address)
+    }
+
+    #[zome_fn("hc_public")]
+    fn update_paste(
+        title: String,
+        text: String,
+        language: String,
+        timestamp: u64,
+        expiration: u64,
+    ) -> ZomeApiResult<Address> {
+        paste::update_paste(title, text, language, timestamp, expiration)
+    }
+
+    #[zome_fn("hc_public")]
+    fn delete_paste(paste_address: Address) -> ZomeApiResult<Address> {
+        paste::delete_paste(paste_address)
+    }
+
+    // TODO: this one is questionable; seems unnecessary
+    #[zome_fn("hc_public")]
+    fn get_all_pastes() -> ZomeApiResult<Vec<Address>> {
+      paste::list()
+    }
+
+    #[zome_fn("hc_public")]
+    fn get_my_pastes() -> ZomeApiResult<Vec<Address>> {
+      course::get_my_pastes()
+    }
+
+    #[zome_fn("hc_public")]
+    pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<Paste>> {
         paste::retrieve_pastes(agent_address)
     }
 }
