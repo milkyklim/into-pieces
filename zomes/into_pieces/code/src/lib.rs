@@ -12,10 +12,12 @@ extern crate holochain_json_derive;
 use hdk::{entry_definition::ValidatingEntryType, error::ZomeApiResult};
 
 use hdk::holochain_persistence_api::cas::content::Address;
+use hdk::holochain_core_types::entry::Entry;
 
 use hdk_proc_macros::zome;
 
 pub mod paste;
+use paste::Paste;
 
 #[zome]
 mod into_pieces_zome {
@@ -38,12 +40,12 @@ mod into_pieces_zome {
 
     #[zome_fn("hc_public")]
     fn get_my_address() -> ZomeApiResult<Address> {
-      Ok(AGENT_ADDRESS.clone())
+      Ok(hdk::AGENT_ADDRESS.clone())
     }
 
     #[entry_def]
     fn anchor_entry_def() -> ValidatingEntryType {
-        paster::anchor_entry_def()
+        paste::anchor_entry_def()
     }
 
     #[entry_def]
@@ -64,23 +66,24 @@ mod into_pieces_zome {
 
     #[zome_fn("hc_public")]
     fn get_paste(address: Address) -> ZomeApiResult<Option<Entry>> {
-        hdk::get_paste(&address)
+        hdk::get_entry(&address)
     }
 
     #[zome_fn("hc_public")]
     fn update_paste(
+        paste_address: Address,
         title: String,
         text: String,
         language: String,
         timestamp: u64,
         expiration: u64,
     ) -> ZomeApiResult<Address> {
-        paste::update_paste(title, text, language, timestamp, expiration)
+        paste::update_paste(&paste_address, title, text, language, timestamp, expiration)
     }
 
     #[zome_fn("hc_public")]
-    fn delete_paste(paste_address: Address) -> ZomeApiResult<Address> {
-        paste::delete_paste(paste_address)
+    fn remove_paste(paste_address: Address) -> ZomeApiResult<Address> {
+        paste::remove_paste(paste_address)
     }
 
     // TODO: this one is questionable; seems unnecessary
@@ -91,7 +94,7 @@ mod into_pieces_zome {
 
     #[zome_fn("hc_public")]
     fn get_my_pastes() -> ZomeApiResult<Vec<Address>> {
-      course::get_my_pastes()
+      paste::get_my_pastes()
     }
 
     #[zome_fn("hc_public")]
