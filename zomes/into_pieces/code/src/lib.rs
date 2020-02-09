@@ -61,7 +61,7 @@ mod into_pieces_zome {
         timestamp: u64,
         expiration: u64,
     ) -> ZomeApiResult<Address> {
-        paste::create_paste(title, text, language, timestamp, expiration)
+        paste::create(title, text, language, timestamp, expiration)
     }
 
     #[zome_fn("hc_public")]
@@ -78,12 +78,12 @@ mod into_pieces_zome {
         timestamp: u64,
         expiration: u64,
     ) -> ZomeApiResult<Address> {
-        paste::update_paste(&paste_address, title, text, language, timestamp, expiration)
+        paste::update(&paste_address, title, text, language, timestamp, expiration)
     }
 
     #[zome_fn("hc_public")]
     fn remove_paste(paste_address: Address) -> ZomeApiResult<Address> {
-        paste::remove_paste(paste_address)
+        paste::remove(paste_address)
     }
 
     // TODO: this one is questionable; seems unnecessary

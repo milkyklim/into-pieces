@@ -136,15 +136,7 @@ pub fn paste_entry_def() -> ValidatingEntryType {
     )
 }
 
-// title: String
-// text: String,
-// language: String,
-// timestamp: u64,
-// expiration: u64,
-// author_id: Address,
-// reported: bool
-
-pub fn create_paste(
+pub fn create(
     title: String,
     text: String,
     language: String,
@@ -169,11 +161,11 @@ pub fn create_paste(
     Ok(address)
 }
 
-pub fn remove_paste(paste_address: Address) -> ZomeApiResult<Address> {
+pub fn remove(paste_address: Address) -> ZomeApiResult<Address> {
     hdk::remove_entry(&paste_address)
 }
 
-pub fn update_paste(
+pub fn update(
     paste_address: &Address,
     title: String,
     text: String,
@@ -181,8 +173,6 @@ pub fn update_paste(
     timestamp: u64,
     expiration: u64,
 ) -> ZomeApiResult<Address> {
-    // let paste: Paste = hdk::utils::get_as_type(paste_address.clone())?;
-
     let new_version_paste = Paste::from(
         title,
         text,
