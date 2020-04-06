@@ -123,7 +123,7 @@ orchestrator.registerScenario("alice can update her paste", async (s, t) => {
   const updateResult = await alice.call(
     "into_pieces",
     "into_pieces",
-    "create_paste",
+    "update_paste",
     {
       address: pasteAddress,
       ...newPasteParams,
