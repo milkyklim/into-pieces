@@ -54,16 +54,29 @@ const PASTE_PARAMS = {
   expiration: 1580167056,
 };
 
+orchestrator.registerScenario("paste zome says hello", async (s, t) => {
+  const { alice } = await s.players({ alice: config }, true);
+  const helloResult = await alice.call(
+    "into_pieces",
+    "into_pieces",
+    "hello_holo",
+    {},
+  );
+
+  t.deepEqual(helloResult.Ok, "Hello Holo");
+});
+
 orchestrator.registerScenario(
-  "alice can add, retrieve and remove her paste",
+  "alice can create, retrieve and remove her paste",
   async (s, t) => {
     const { alice } = await s.players({ alice: config }, true);
+    const params = PASTE_PARAMS;
 
     const createResult = await alice.call(
       "into_pieces",
       "into_pieces",
       "create_paste",
-      PASTE_PARAMS,
+      params,
     );
     t.ok(createResult.Ok);
 
@@ -77,7 +90,7 @@ orchestrator.registerScenario(
     );
     const paste = JSON.parse(retrieveResult.Ok.App[1]);
     t.deepEqual(paste, {
-      ...PASTE_PARAMS,
+      ...params,
       author_id: alice.instance("into_pieces").agentAddress,
       reported: false,
     });
@@ -91,5 +104,47 @@ orchestrator.registerScenario(
     t.ok(removeResult.Ok);
   },
 );
+
+orchestrator.registerScenario("alice can update her paste", async (s, t) => {
+  const { alice } = await s.players({ alice: config }, true);
+  const params = PASTE_PARAMS;
+  const createResult = await alice.call(
+    "into_pieces",
+    "into_pieces",
+    "create_paste",
+    params,
+  );
+
+  let pasteAddress = createResult.Ok;
+  const newPasteParams = PASTE_PARAMS;
+  newPasteParams.title = "That's the second paste!";
+  newPasteParams.language = "Plain";
+
+  const updateResult = await alice.call(
+    "into_pieces",
+    "into_pieces",
+    "create_paste",
+    {
+      address: pasteAddress,
+      ...newPasteParams,
+    },
+  );
+
+  t.ok(updateResult.Ok);
+
+  pasteAddress = updateResult.Ok;
+  const retrieveResult = await alice.call(
+    "into_pieces",
+    "into_pieces",
+    "get_paste",
+    { address: pasteAddress },
+  );
+  const paste = JSON.parse(retrieveResult.Ok.App[1]);
+  t.deepEqual(paste, {
+    ...newPasteParams,
+    author_id: alice.instance("into_pieces").agentAddress,
+    reported: false,
+  });
+});
 
 orchestrator.run();
