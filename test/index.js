@@ -147,4 +147,37 @@ orchestrator.registerScenario("alice can update her paste", async (s, t) => {
   });
 });
 
+orchestrator.registerScenario(
+  "bob can retrieve alice's paste",
+  async (s, t) => {
+    const { alice, bob } = await s.players(
+      { alice: config, bob: config },
+      true,
+    );
+
+    const params = PASTE_PARAMS;
+    const createResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "create_paste",
+      params,
+    );
+    await s.consistency();
+
+    const pasteAddress = createResult.Ok;
+    const retrieveResult = await bob.call(
+      "into_pieces",
+      "into_pieces",
+      "get_paste",
+      { address: pasteAddress },
+    );
+    const paste = JSON.parse(retrieveResult.Ok.App[1]);
+    t.deepEqual(paste, {
+      ...params,
+      author_id: alice.instance("into_pieces").agentAddress,
+      reported: false,
+    });
+  },
+);
+
 orchestrator.run();
