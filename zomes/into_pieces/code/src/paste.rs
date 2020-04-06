@@ -80,8 +80,9 @@ impl Paste {
 
 
 fn validate_entry(paste: &Paste) -> Result<(), String> {
-    // TODO: verify that this one is correct
-    validate_title(&paste.title).and_then(|_| validate_text(&paste.text))
+    validate_title(&paste.title).and_then(|_| validate_title(&paste.title))?;
+    validate_text(&paste.text).and_then(|_| validate_text(&paste.text))?;
+    Ok(())
 }
 
 fn validate_title(title: &str) -> Result<(), String> {
@@ -108,7 +109,7 @@ fn check_length(s: &str, max_length: usize, info_text: &str) -> Result<(), Strin
 pub fn paste_entry_def() -> ValidatingEntryType {
     entry!(
         name: "paste",
-        description: "A paste",
+        description: "A piece of text",
         sharing: Sharing::Public,
         validation_package: || {
             hdk::ValidationPackageDefinition::Entry
@@ -153,11 +154,10 @@ pub fn create(
         reported: false,
     };
 
-    let agent_address = hdk::AGENT_ADDRESS.clone().into();
     let entry = Entry::App("paste".into(), paste.into());
     let address = hdk::commit_entry(&entry)?;
 
-    hdk::link_entries(&agent_address, &address, "author_paste", "")?;
+    hdk::link_entries(&hdk::AGENT_ADDRESS, &address, "author_paste", "")?;
     Ok(address)
 }
 
@@ -186,14 +186,6 @@ pub fn update(
     hdk::update_entry(new_version_paste_entry, paste_address)
 }
 
-pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<Paste>> {
-    hdk::utils::get_links_and_load_type(
-        &agent_address,
-        LinkMatch::Exactly("author_paste"),
-        LinkMatch::Any,
-    )
-}
-
 pub fn anchor_entry() -> Entry {
     Entry::App("anchor".into(), "paste".into())
 }
@@ -202,7 +194,7 @@ pub fn anchor_address() -> ZomeApiResult<Address> {
     hdk::entry_address(&anchor_entry())
 }
 
-pub fn list() -> ZomeApiResult<Vec<Address>> {
+pub fn get_all_pastes() -> ZomeApiResult<Vec<Address>> {
     let addresses = hdk::get_links(
         &anchor_address()?,
         LinkMatch::Exactly("paste_list"),
@@ -226,7 +218,7 @@ pub fn get_my_pastes() -> ZomeApiResult<Vec<Address>> {
 
 pub fn anchor_entry_def() -> ValidatingEntryType {
     entry!(
-        name: "anchor", 
+        name: "anchor",
         description: "Anchor to all pastes",
         sharing: Sharing::Public,
         validation_package: || {

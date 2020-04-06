@@ -17,7 +17,9 @@ use hdk::holochain_core_types::entry::Entry;
 use hdk_proc_macros::zome;
 
 pub mod paste;
-use paste::Paste;
+
+// TODO:
+// [ ] is "pub" necessary, is it missing?
 
 #[zome]
 mod into_pieces_zome {
@@ -89,16 +91,11 @@ mod into_pieces_zome {
     // TODO: this one is questionable; seems unnecessary
     #[zome_fn("hc_public")]
     fn get_all_pastes() -> ZomeApiResult<Vec<Address>> {
-      paste::list()
+      paste::get_all_pastes()
     }
 
     #[zome_fn("hc_public")]
     fn get_my_pastes() -> ZomeApiResult<Vec<Address>> {
       paste::get_my_pastes()
-    }
-
-    #[zome_fn("hc_public")]
-    pub fn retrieve_pastes(agent_address: Address) -> ZomeApiResult<Vec<Paste>> {
-        paste::retrieve_pastes(agent_address)
     }
 }
