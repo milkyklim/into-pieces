@@ -79,26 +79,6 @@ orchestrator.registerScenario("Test hello holo", async (s, t) => {
   );
   t.ok(create_result.Ok);
   const alice_person_address = alice.instance("into_pieces").agentAddress;
-
-  await s.consistency();
-
-  const retrieve_result = await bob.call(
-    "into_pieces",
-    "into_pieces",
-    "retrieve_pastes",
-    { agent_address: alice_person_address },
-  );
-
-  t.ok(retrieve_result.Ok);
-  t.deepEqual(retrieve_result.Ok[0], {
-    title: title,
-    text: text,
-    language: language,
-    timestamp: timestamp,
-    expiration: expiration,
-    author_id: alice_person_address,
-    reported: false,
-  });
 });
 
 orchestrator.run();
