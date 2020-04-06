@@ -70,7 +70,7 @@ orchestrator.registerScenario(
   "alice can create, retrieve and remove her paste",
   async (s, t) => {
     const { alice } = await s.players({ alice: config }, true);
-    const params = PASTE_PARAMS;
+    const params = { ...PASTE_PARAMS };
 
     const createResult = await alice.call(
       "into_pieces",
@@ -107,7 +107,7 @@ orchestrator.registerScenario(
 
 orchestrator.registerScenario("alice can update her paste", async (s, t) => {
   const { alice } = await s.players({ alice: config }, true);
-  const params = PASTE_PARAMS;
+  const params = { ...PASTE_PARAMS };
   const createResult = await alice.call(
     "into_pieces",
     "into_pieces",
@@ -116,7 +116,7 @@ orchestrator.registerScenario("alice can update her paste", async (s, t) => {
   );
 
   let pasteAddress = createResult.Ok;
-  const newPasteParams = PASTE_PARAMS;
+  const newPasteParams = { ...PASTE_PARAMS };
   newPasteParams.title = "That's the second paste!";
   newPasteParams.language = "Plain";
 
@@ -155,7 +155,7 @@ orchestrator.registerScenario(
       true,
     );
 
-    const params = PASTE_PARAMS;
+    const params = { ...PASTE_PARAMS };
     const createResult = await alice.call(
       "into_pieces",
       "into_pieces",
@@ -182,7 +182,7 @@ orchestrator.registerScenario(
 
 orchestrator.registerScenario("bob can update alice's paste", async (s, t) => {
   const { alice, bob } = await s.players({ alice: config, bob: config }, true);
-  const params = PASTE_PARAMS;
+  const params = { ...PASTE_PARAMS };
   const createResult = await alice.call(
     "into_pieces",
     "into_pieces",
@@ -192,7 +192,7 @@ orchestrator.registerScenario("bob can update alice's paste", async (s, t) => {
   await s.consistency();
 
   let pasteAddress = createResult.Ok;
-  const newPasteParams = PASTE_PARAMS;
+  const newPasteParams = { ...PASTE_PARAMS };
   newPasteParams.title = "That's the second paste!";
   newPasteParams.language = "Plain";
 
@@ -223,5 +223,45 @@ orchestrator.registerScenario("bob can update alice's paste", async (s, t) => {
     reported: false,
   });
 });
+
+orchestrator.registerScenario(
+  "alice can't create post with title too long",
+  async (s, t) => {
+    const { alice } = await s.players({ alice: config }, true);
+    const params = { ...PASTE_PARAMS };
+    // title >= 50 chars
+    params.title = "d".repeat(50);
+
+    const createResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "create_paste",
+      params,
+    );
+
+    const error = JSON.parse(createResult.Err.Internal);
+    t.equal(error.kind.ValidationFailed, "Symbols in title above 50");
+  },
+);
+
+orchestrator.registerScenario(
+  "alice can't create post with text too long",
+  async (s, t) => {
+    const { alice } = await s.players({ alice: config }, true);
+    const params = { ...PASTE_PARAMS };
+    // text >= 1024 chars
+    params.text = "d".repeat(1024);
+
+    const createResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "create_paste",
+      params,
+    );
+
+    const error = JSON.parse(createResult.Err.Internal);
+    t.equal(error.kind.ValidationFailed, "Symbols in text above 1024");
+  },
+);
 
 orchestrator.run();
