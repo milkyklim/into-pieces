@@ -4,11 +4,10 @@
 
 ## User stories
 
-Any agent should be able to 
+Any agent should be able to
 
 - create, update (essentially fork) and remove pastes.
 - query the list of created pastes.
-
 
 ## Entry structure
 
@@ -62,11 +61,11 @@ graph TD
 
 ### Entries
 
-* `paste`:
-	* title should be <= 50 chars; 
-  * text should be <= 1024 chars;
-  * `agent_address` should match entry signer on create, update or delete entry.
+- `paste`: \* title should be <= 50 chars;
 
-* `anchors`:
-  * `agent_address` should match entry signer on create;
-  * anchor update or delete is not valid.
+  - text should be <= 1024 chars;
+  - `agent_address` should match entry signer on create, update or delete entry.
+
+- `anchors`:
+  - `agent_address` should match entry signer on create;
+  - anchor update or delete is not valid.
