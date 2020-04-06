@@ -46,39 +46,50 @@ const config = Config.gen(
   },
 );
 
-orchestrator.registerScenario("Test hello holo", async (s, t) => {
-  const { alice, bob } = await s.players({ alice: config, bob: config }, true);
+const PASTE_PARAMS = {
+  title: "First paste of all",
+  text: "Have you ever tried into pieces?",
+  language: "None",
+  timestamp: 1580137056,
+  expiration: 1580167056,
+};
 
-  const title = "First paste of all";
-  const text = "Have you ever tried into pieces?";
-  const language = "Plain";
-  const timestamp = 1580137056;
-  const expiration = 1580167056;
+orchestrator.registerScenario(
+  "alice can add, retrieve and remove her paste",
+  async (s, t) => {
+    const { alice } = await s.players({ alice: config }, true);
 
-  const result = await alice.call(
-    "into_pieces",
-    "into_pieces",
-    "hello_holo",
-    {},
-  );
+    const createResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "create_paste",
+      PASTE_PARAMS,
+    );
+    t.ok(createResult.Ok);
 
-  t.ok(result.Ok);
-  t.deepEqual(result, { Ok: "Hello Holo" });
+    const pasteAddress = createResult.Ok;
 
-  const create_result = await alice.call(
-    "into_pieces",
-    "into_pieces",
-    "create_paste",
-    {
-      title: title,
-      text: text,
-      language: language,
-      timestamp: timestamp,
-      expiration: expiration,
-    },
-  );
-  t.ok(create_result.Ok);
-  const alice_person_address = alice.instance("into_pieces").agentAddress;
-});
+    const retrieveResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "get_paste",
+      { address: pasteAddress },
+    );
+    const paste = JSON.parse(retrieveResult.Ok.App[1]);
+    t.deepEqual(paste, {
+      ...PASTE_PARAMS,
+      author_id: alice.instance("into_pieces").agentAddress,
+      reported: false,
+    });
+
+    const removeResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "remove_paste",
+      { address: pasteAddress },
+    );
+    t.ok(removeResult.Ok);
+  },
+);
 
 orchestrator.run();
