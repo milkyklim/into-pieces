@@ -180,4 +180,48 @@ orchestrator.registerScenario(
   },
 );
 
+orchestrator.registerScenario("bob can update alice's paste", async (s, t) => {
+  const { alice, bob } = await s.players({ alice: config, bob: config }, true);
+  const params = PASTE_PARAMS;
+  const createResult = await alice.call(
+    "into_pieces",
+    "into_pieces",
+    "create_paste",
+    params,
+  );
+  await s.consistency();
+
+  let pasteAddress = createResult.Ok;
+  const newPasteParams = PASTE_PARAMS;
+  newPasteParams.title = "That's the second paste!";
+  newPasteParams.language = "Plain";
+
+  const updateResult = await bob.call(
+    "into_pieces",
+    "into_pieces",
+    "update_paste",
+    {
+      address: pasteAddress,
+      ...newPasteParams,
+    },
+  );
+
+  t.ok(updateResult.Ok);
+  await s.consistency();
+
+  pasteAddress = updateResult.Ok;
+  const retrieveResult = await alice.call(
+    "into_pieces",
+    "into_pieces",
+    "get_paste",
+    { address: pasteAddress },
+  );
+  const paste = JSON.parse(retrieveResult.Ok.App[1]);
+  t.deepEqual(paste, {
+    ...newPasteParams,
+    author_id: bob.instance("into_pieces").agentAddress,
+    reported: false,
+  });
+});
+
 orchestrator.run();
