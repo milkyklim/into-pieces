@@ -100,9 +100,23 @@ fn validate_text(text: &str) -> Result<(), String> {
 }
 
 fn check_length(s: &str, max_length: usize, info_text: &str) -> Result<(), String> {
-    match s.len() < max_length {
-        true => Ok(()),
-        false => Err(format!("{} {}", info_text, max_length).to_string()),
+    if s.len() < max_length {
+        Ok(())
+    }
+    else {
+        Err(format!("{} {}", info_text, max_length))
+    }
+}
+
+pub fn validate_author(paste: &Paste) -> Result<(), String> {
+    let agent_address: String = hdk::AGENT_ADDRESS.to_string();
+    let paste_author: String = paste.author_id.to_string();
+
+    if agent_address == paste_author {
+        Ok(())
+    }
+    else {
+        Err(format!("Author and current agent id don't match: {} != {}", paste_author, agent_address))
     }
 }
 
@@ -116,8 +130,11 @@ pub fn paste_entry_def() -> ValidatingEntryType {
         },
         validation: | validation_data: hdk::EntryValidationData<Paste> | {
             match validation_data {
-                hdk::EntryValidationData::Create{ entry, .. } => {
+                hdk::EntryValidationData::Create { entry, .. } => {
                     validate_entry(&entry)
+                },
+                hdk::EntryValidationData::Delete { old_entry, .. } => {
+                    validate_author(&old_entry)
                 },
                 _ => Ok(()),
             }

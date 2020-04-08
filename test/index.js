@@ -13,7 +13,7 @@ const {
   tapeExecutor,
 } = require("@holochain/tryorama");
 
-process.on("unhandledRejection", error => {
+process.on("unhandledRejection", (error) => {
   // Will print "unhandledRejection err is not defined"
   console.error("got unhandledRejection:", error);
 });
@@ -261,6 +261,42 @@ orchestrator.registerScenario(
 
     const error = JSON.parse(createResult.Err.Internal);
     t.equal(error.kind.ValidationFailed, "Symbols in text above 1024");
+  },
+);
+
+orchestrator.registerScenario(
+  "bob can't remove alice's paste",
+  async (s, t) => {
+    const { alice, bob } = await s.players(
+      { alice: config, bob: config },
+      true,
+    );
+    const params = { ...PASTE_PARAMS };
+
+    const createResult = await alice.call(
+      "into_pieces",
+      "into_pieces",
+      "create_paste",
+      params,
+    );
+
+    await s.consistency();
+
+    const pasteAddress = createResult.Ok;
+    const removeResult = await bob.call(
+      "into_pieces",
+      "into_pieces",
+      "remove_paste",
+      { address: pasteAddress },
+    );
+
+    const error = JSON.parse(removeResult.Err.Internal);
+    t.equal(
+      error.kind.ValidationFailed,
+      `Author and current agent id don't match: ${
+        alice.instance("into_pieces").agentAddress
+      } != ${bob.instance("into_pieces").agentAddress}`,
+    );
   },
 );
 
