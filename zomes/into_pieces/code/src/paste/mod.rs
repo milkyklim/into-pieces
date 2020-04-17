@@ -91,11 +91,11 @@ pub fn paste_entry_def() -> ValidatingEntryType {
         },
         validation: | validation_data: hdk::EntryValidationData<Paste> | {
             match validation_data {
-                hdk::EntryValidationData::Create { entry, .. } => {
-                    validation::validate_entry(&entry)
+                hdk::EntryValidationData::Create { entry, validation_data } => {
+                    validation::validate_entry(&entry, &validation_data)
                 },
-                hdk::EntryValidationData::Delete { old_entry, .. } => {
-                    validation::validate_author(&old_entry)
+                hdk::EntryValidationData::Delete { old_entry, old_entry_header, validation_data } => {
+                    validation::validate_author(&old_entry, &old_entry_header, &validation_data)
                 },
                 _ => Ok(()),
             }

@@ -293,9 +293,7 @@ orchestrator.registerScenario(
     const error = JSON.parse(removeResult.Err.Internal);
     t.equal(
       error.kind.ValidationFailed,
-      `Author and current agent id don't match: ${
-        alice.instance("into_pieces").agentAddress
-      } != ${bob.instance("into_pieces").agentAddress}`,
+      "Agent who did not author is trying to delete",
     );
   },
 );
