@@ -18,9 +18,6 @@ use hdk_proc_macros::zome;
 
 pub mod paste;
 
-// TODO:
-// [ ] is "pub" necessary, is it missing?
-
 #[zome]
 mod into_pieces_zome {
 
@@ -47,7 +44,7 @@ mod into_pieces_zome {
 
     #[entry_def]
     fn anchor_entry_def() -> ValidatingEntryType {
-        paste::anchor_entry_def()
+        paste::handlers::anchor_entry_def()
     }
 
     #[entry_def]
@@ -56,14 +53,14 @@ mod into_pieces_zome {
     }
 
     #[zome_fn("hc_public")]
-    pub fn create_paste(
+    fn create_paste(
         title: String,
         text: String,
         language: String,
         timestamp: u64,
         expiration: u64,
     ) -> ZomeApiResult<Address> {
-        paste::create(title, text, language, timestamp, expiration)
+        paste::handlers::create(title, text, language, timestamp, expiration)
     }
 
     #[zome_fn("hc_public")]
@@ -80,22 +77,22 @@ mod into_pieces_zome {
         timestamp: u64,
         expiration: u64,
     ) -> ZomeApiResult<Address> {
-        paste::update(&address, title, text, language, timestamp, expiration)
+        paste::handlers::update(&address, title, text, language, timestamp, expiration)
     }
 
     #[zome_fn("hc_public")]
     fn remove_paste(address: Address) -> ZomeApiResult<Address> {
-        paste::remove(address)
+        paste::handlers::remove(address)
     }
 
     // TODO: this one is questionable; seems unnecessary
     #[zome_fn("hc_public")]
     fn get_all_pastes() -> ZomeApiResult<Vec<Address>> {
-      paste::get_all_pastes()
+      paste::handlers::get_all_pastes()
     }
 
     #[zome_fn("hc_public")]
     fn get_my_pastes() -> ZomeApiResult<Vec<Address>> {
-      paste::get_my_pastes()
+      paste::handlers::get_my_pastes()
     }
 }
