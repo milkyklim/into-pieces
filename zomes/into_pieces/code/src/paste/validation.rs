@@ -11,13 +11,13 @@ pub fn validate_entry_create(entry: &Paste, _validation_data: &hdk::ValidationDa
 }
 
 pub fn validate_entry_update(_new_entry: &Paste, _old_entry: &Paste, _old_entry_header: &ChainHeader, _validation_data: &hdk::ValidationData) -> Result<(), String> {
-    // TODO:
+    // we don't need author validation, cause we essentially create fork
+    // validate_author(old_entry_header, validation_data)?;
     Ok(())
 }
 
-
-pub fn validate_entry_delete(old_entry: &Paste, old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
-    validate_author(old_entry, old_entry_header, validation_data)?;
+pub fn validate_entry_delete(_old_entry: &Paste, old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
+    validate_author(old_entry_header, validation_data)?;
     Ok(())
 }
 
@@ -59,16 +59,13 @@ pub fn check_length(s: &str, max_length: usize, info_text: &str) -> Result<(), S
     }
 }
 
-pub fn validate_author(old_entry: &Paste, old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
-    // TODO: should we check that paste_author is the same as in provenances()?
-    // let paste_author: String = paste.author_id.to_string();
-
+pub fn validate_author(old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
     if let (Some(o), Some(p)) = (old_entry_header.provenances().get(0), validation_data.package.chain_header.provenances().get(0)) {
         if o.source() == p.source() {
           Ok(())
         }
         else {
-          Err("Agent who did not author is trying to delete".to_string())
+          Err("Agent who did not author is trying to call function".to_string())
         }
     }
     else {

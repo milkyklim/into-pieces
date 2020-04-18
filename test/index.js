@@ -289,7 +289,7 @@ orchestrator.registerScenario(
     const error = JSON.parse(removeResult.Err.Internal);
     t.equal(
       error.kind.ValidationFailed,
-      "Agent who did not author is trying to delete",
+      "Agent who did not author is trying to call function",
     );
   },
 );
