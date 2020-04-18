@@ -56,7 +56,6 @@ pub fn create(
         language,
         timestamp,
         expiration,
-        author_id: hdk::AGENT_ADDRESS.clone(),
         reported: false,
     };
 
@@ -67,7 +66,7 @@ pub fn create(
     Ok(address)
 }
 
-pub fn remove(paste_address: Address) -> ZomeApiResult<Address> {
+pub fn remove(paste_address: &Address) -> ZomeApiResult<Address> {
     hdk::remove_entry(&paste_address)
 }
 
@@ -84,8 +83,7 @@ pub fn update(
         text,
         language,
         timestamp,
-        expiration,
-        hdk::AGENT_ADDRESS.clone() // TODO: check this one
+        expiration
     );
     let new_version_paste_entry = new_version_paste.entry();
 

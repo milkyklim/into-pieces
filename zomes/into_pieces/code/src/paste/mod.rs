@@ -11,8 +11,6 @@ use hdk::holochain_core_types::{dna::entry_types::Sharing, entry::Entry};
 
 use hdk::holochain_json_api::{error::JsonError, json::JsonString};
 
-use hdk::holochain_persistence_api::cas::content::Address;
-
 pub mod handlers;
 pub mod validation;
 
@@ -26,7 +24,6 @@ pub struct Paste {
     expiration: u64,
     // Probably a privat entry rather than password
     // password: String
-    author_id: Address,
     // Probably marked if not directly removed
     reported: bool, // Probably counter signing or smth like that
                     // This one probably will be a list of all links
@@ -42,7 +39,6 @@ impl Paste {
         language: String,
         timestamp: u64,
         expiration: u64,
-        author_id: Address,
         // reported: bool
     ) -> Self {
         Paste {
@@ -51,7 +47,6 @@ impl Paste {
             language,
             timestamp,
             expiration,
-            author_id,
             reported: false
         }
     }
@@ -62,7 +57,6 @@ impl Paste {
         language: String,
         timestamp: u64,
         expiration: u64,
-        author_id: Address,
         // reported: bool
     ) -> Self {
         Paste {
@@ -71,7 +65,6 @@ impl Paste {
             language,
             timestamp,
             expiration,
-            author_id,
             reported: false
         }
     }
@@ -92,12 +85,14 @@ pub fn paste_entry_def() -> ValidatingEntryType {
         validation: | validation_data: hdk::EntryValidationData<Paste> | {
             match validation_data {
                 hdk::EntryValidationData::Create { entry, validation_data } => {
-                    validation::validate_entry(&entry, &validation_data)
+                    validation::validate_entry_create(&entry, &validation_data)
+                },
+                hdk::EntryValidationData::Modify { new_entry, old_entry, old_entry_header, validation_data } => {
+                    validation::validate_entry_update(&new_entry, &old_entry, &old_entry_header, &validation_data)
                 },
                 hdk::EntryValidationData::Delete { old_entry, old_entry_header, validation_data } => {
-                    validation::validate_author(&old_entry, &old_entry_header, &validation_data)
-                },
-                _ => Ok(()),
+                    validation::validate_entry_delete(&old_entry, &old_entry_header, &validation_data)
+                }
             }
         },
         links: [
@@ -107,8 +102,15 @@ pub fn paste_entry_def() -> ValidatingEntryType {
                 validation_package: || {
                     hdk::ValidationPackageDefinition::Entry
                 },
-                validation: | _validation_data: hdk::LinkValidationData | {
-                    Ok(())
+                validation: | validation_data: hdk::LinkValidationData | {
+                    match validation_data {
+                        hdk::LinkValidationData::LinkAdd{link, validation_data} => {
+                            validation::validate_link_add(&link, &validation_data)
+                        },
+                        hdk::LinkValidationData::LinkRemove{link, validation_data} => {
+                            validation::validate_link_remove(&link, &validation_data)
+                        }
+                    }
                 }
             )
         ]

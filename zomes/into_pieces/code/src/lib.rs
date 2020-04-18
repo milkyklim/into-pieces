@@ -82,7 +82,7 @@ mod into_pieces_zome {
 
     #[zome_fn("hc_public")]
     fn remove_paste(address: Address) -> ZomeApiResult<Address> {
-        paste::handlers::remove(address)
+        paste::handlers::remove(&address)
     }
 
     // TODO: this one is questionable; seems unnecessary

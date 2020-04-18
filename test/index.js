@@ -91,7 +91,6 @@ orchestrator.registerScenario(
     const paste = JSON.parse(retrieveResult.Ok.App[1]);
     t.deepEqual(paste, {
       ...params,
-      author_id: alice.instance("into_pieces").agentAddress,
       reported: false,
     });
 
@@ -142,7 +141,6 @@ orchestrator.registerScenario("alice can update her paste", async (s, t) => {
   const paste = JSON.parse(retrieveResult.Ok.App[1]);
   t.deepEqual(paste, {
     ...newPasteParams,
-    author_id: alice.instance("into_pieces").agentAddress,
     reported: false,
   });
 });
@@ -174,7 +172,6 @@ orchestrator.registerScenario(
     const paste = JSON.parse(retrieveResult.Ok.App[1]);
     t.deepEqual(paste, {
       ...params,
-      author_id: alice.instance("into_pieces").agentAddress,
       reported: false,
     });
   },
@@ -219,7 +216,6 @@ orchestrator.registerScenario("bob can update alice's paste", async (s, t) => {
   const paste = JSON.parse(retrieveResult.Ok.App[1]);
   t.deepEqual(paste, {
     ...newPasteParams,
-    author_id: bob.instance("into_pieces").agentAddress,
     reported: false,
   });
 });

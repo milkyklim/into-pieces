@@ -1,11 +1,33 @@
-use hdk::holochain_core_types::{chain_header::ChainHeader};
+use hdk::holochain_core_types::{chain_header::ChainHeader, link::link_data::LinkData};
 
 use crate::paste::Paste;
 
 // TODO: update _validation_data check
-pub fn validate_entry(paste: &Paste, _validation_data: &hdk::ValidationData) -> Result<(), String> {
-    validate_title(&paste.title).and_then(|_| validate_title(&paste.title))?;
-    validate_text(&paste.text).and_then(|_| validate_text(&paste.text))?;
+pub fn validate_entry_create(entry: &Paste, _validation_data: &hdk::ValidationData) -> Result<(), String> {
+    validate_title(&entry.title)?;
+    validate_text(&entry.text)?;
+    validate_language(&entry.language)?;
+    Ok(())
+}
+
+pub fn validate_entry_update(_new_entry: &Paste, _old_entry: &Paste, _old_entry_header: &ChainHeader, _validation_data: &hdk::ValidationData) -> Result<(), String> {
+    // TODO:
+    Ok(())
+}
+
+
+pub fn validate_entry_delete(old_entry: &Paste, old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
+    validate_author(old_entry, old_entry_header, validation_data)?;
+    Ok(())
+}
+
+pub fn validate_link_add(_link: &LinkData, _validation_data: &hdk::ValidationData) -> Result<(), String> {
+    // TODO:
+    Ok(())
+}
+
+pub fn validate_link_remove(_link: &LinkData, _validation_data: &hdk::ValidationData) -> Result<(), String> {
+    // TODO:
     Ok(())
 }
 
@@ -23,6 +45,11 @@ pub fn validate_text(text: &str) -> Result<(), String> {
     check_length(text, MAX_TEXT_LENGTH, INFO_TEXT)
 }
 
+pub fn validate_language(_language: &str) -> Result<(), String> {
+    // TODO:
+    Ok(())
+}
+
 pub fn check_length(s: &str, max_length: usize, info_text: &str) -> Result<(), String> {
     if s.len() < max_length {
         Ok(())
@@ -32,7 +59,7 @@ pub fn check_length(s: &str, max_length: usize, info_text: &str) -> Result<(), S
     }
 }
 
-pub fn validate_author(_paste: &Paste, old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
+pub fn validate_author(old_entry: &Paste, old_entry_header: &ChainHeader, validation_data: &hdk::ValidationData) -> Result<(), String> {
     // TODO: should we check that paste_author is the same as in provenances()?
     // let paste_author: String = paste.author_id.to_string();
 
