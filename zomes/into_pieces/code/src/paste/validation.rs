@@ -10,9 +10,14 @@ pub fn validate_entry_create(entry: &Paste, _validation_data: &hdk::ValidationDa
     Ok(())
 }
 
-pub fn validate_entry_update(_new_entry: &Paste, _old_entry: &Paste, _old_entry_header: &ChainHeader, _validation_data: &hdk::ValidationData) -> Result<(), String> {
+pub fn validate_entry_update(new_entry: &Paste, _old_entry: &Paste, _old_entry_header: &ChainHeader, _validation_data: &hdk::ValidationData) -> Result<(), String> {
     // we don't need author validation, cause we essentially create fork
-    // validate_author(old_entry_header, validation_data)?;
+    // we don't need to check old entry, cause it was validated during creation
+
+    validate_title(&new_entry.title)?;
+    validate_text(&new_entry.text)?;
+    validate_language(&new_entry.language)?;
+
     Ok(())
 }
 
