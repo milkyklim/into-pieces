@@ -7,12 +7,27 @@ extern crate serde_json;
 
 use hdk::entry_definition::ValidatingEntryType;
 
-use hdk::holochain_core_types::{dna::entry_types::Sharing, entry::Entry};
+use hdk::{
+    holochain_core_types::{
+        dna::entry_types::Sharing,
+        entry::Entry
+    },
+    error::ZomeApiResult,
+    holochain_persistence_api::cas::content::Address
+};
 
 use hdk::holochain_json_api::{error::JsonError, json::JsonString};
 
 pub mod handlers;
 pub mod validation;
+
+const PASTE_ENTRY_NAME: &str = "paste";
+const PASTE_LINK_TYPE: &str = "paste_link";
+const PASTES_ANCHOR_TYPE: &str = "pastes";
+const PASTES_ANCHOR_TEXT: &str = "pastes";
+
+const ANCHOR_TYPE: &str = "anchor";
+const ANCHOR_LINK_TYPE: &str = "anchor_link";
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct Paste {
@@ -70,13 +85,13 @@ impl Paste {
     }
 
     pub fn entry(&self) -> Entry {
-        Entry::App("paste".into(), self.into())
+        Entry::App(PASTE_ENTRY_NAME.into(), self.into())
     }
 }
 
 pub fn paste_entry_def() -> ValidatingEntryType {
     entry!(
-        name: "paste",
+        name: PASTE_ENTRY_NAME,
         description: "A piece of text",
         sharing: Sharing::Public,
         validation_package: || {
@@ -98,7 +113,7 @@ pub fn paste_entry_def() -> ValidatingEntryType {
         links: [
             from!(
                 "%agent_id",
-                link_type: "author_paste",
+                link_type: PASTE_LINK_TYPE,
                 validation_package: || {
                     hdk::ValidationPackageDefinition::Entry
                 },
@@ -111,6 +126,40 @@ pub fn paste_entry_def() -> ValidatingEntryType {
                             validation::validate_link_remove(&link, &validation_data)
                         }
                     }
+                }
+            )
+        ]
+    )
+}
+
+pub fn anchor_address() -> ZomeApiResult<Address> {
+    hdk::entry_address(&anchor_entry())
+}
+
+pub fn anchor_entry() -> Entry {
+    Entry::App(PASTES_ANCHOR_TYPE.into(), PASTES_ANCHOR_TEXT.into())
+}
+
+pub fn anchor_entry_def() -> ValidatingEntryType {
+    entry!(
+        name: ANCHOR_TYPE,
+        description: "Anchor to all pastes",
+        sharing: Sharing::Public,
+        validation_package: || {
+            hdk::ValidationPackageDefinition::Entry
+        },
+        validation: | _validation_data: hdk::EntryValidationData<String>| {
+            Ok(())
+        },
+        links: [
+            to!(
+                PASTE_ENTRY_NAME,
+                link_type: ANCHOR_LINK_TYPE,
+                validation_package: || {
+                    hdk::ValidationPackageDefinition::Entry
+                },
+                validation: |_validation_data: hdk::LinkValidationData| {
+                    Ok(())
                 }
             )
         ]

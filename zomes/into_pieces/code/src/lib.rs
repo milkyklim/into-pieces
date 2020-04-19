@@ -44,7 +44,7 @@ mod into_pieces_zome {
 
     #[entry_def]
     fn anchor_entry_def() -> ValidatingEntryType {
-        paste::handlers::anchor_entry_def()
+        paste::anchor_entry_def()
     }
 
     #[entry_def]

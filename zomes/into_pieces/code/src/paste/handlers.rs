@@ -7,41 +7,13 @@ use hdk::{
     prelude::*,
 };
 
-use crate::paste::Paste;
-
-pub fn anchor_address() -> ZomeApiResult<Address> {
-    hdk::entry_address(&anchor_entry())
-}
-
-pub fn anchor_entry() -> Entry {
-    Entry::App("anchor".into(), "paste".into())
-}
-
-pub fn anchor_entry_def() -> ValidatingEntryType {
-    entry!(
-        name: "anchor",
-        description: "Anchor to all pastes",
-        sharing: Sharing::Public,
-        validation_package: || {
-            hdk::ValidationPackageDefinition::Entry
-        },
-        validation: | _validation_data: hdk::EntryValidationData<String>| {
-            Ok(())
-        },
-        links: [
-            to!(
-                "paste",
-                link_type: "paste_list",
-                validation_package: || {
-                    hdk::ValidationPackageDefinition::Entry
-                },
-                validation: |_validation_data: hdk::LinkValidationData| {
-                    Ok(())
-                }
-            )
-        ]
-    )
-}
+use crate::paste::{
+    anchor_address,
+    Paste,
+    PASTE_ENTRY_NAME,
+    PASTE_LINK_TYPE,
+    ANCHOR_LINK_TYPE
+};
 
 pub fn create(
     title: String,
@@ -59,15 +31,17 @@ pub fn create(
         reported: false,
     };
 
-    let entry = Entry::App("paste".into(), paste.into());
+    let entry = Entry::App(PASTE_ENTRY_NAME.into(), paste.into());
     let address = hdk::commit_entry(&entry)?;
 
-    hdk::link_entries(&hdk::AGENT_ADDRESS, &address, "author_paste", "")?;
+    hdk::link_entries(&hdk::AGENT_ADDRESS, &address, PASTE_LINK_TYPE, "")?;
     Ok(address)
 }
 
 pub fn remove(paste_address: &Address) -> ZomeApiResult<Address> {
-    hdk::remove_entry(&paste_address)
+    // FIXME: add link removal that points to the entry
+    // hdk::remove_link(&anchor_address()?, paste_address, PASTE_LINK_TYPE, "")?;
+    hdk::remove_entry(paste_address)
 }
 
 pub fn update(
@@ -94,7 +68,7 @@ pub fn update(
 pub fn get_all_pastes() -> ZomeApiResult<Vec<Address>> {
     let addresses = hdk::get_links(
         &anchor_address()?,
-        LinkMatch::Exactly("paste_list"),
+        LinkMatch::Exactly(ANCHOR_LINK_TYPE),
         LinkMatch::Any,
     )?
     .addresses();
@@ -106,7 +80,7 @@ pub fn get_all_pastes() -> ZomeApiResult<Vec<Address>> {
 pub fn get_my_pastes() -> ZomeApiResult<Vec<Address>> {
     let links = hdk::get_links(
         &hdk::AGENT_ADDRESS,
-        LinkMatch::Exactly("author_paste"),
+        LinkMatch::Exactly(PASTE_LINK_TYPE),
         LinkMatch::Any,
     )?;
 
